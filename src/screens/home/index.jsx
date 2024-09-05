@@ -9,10 +9,11 @@ import { Image, ImageBackground } from 'expo-image'
 import Carousel from 'react-native-reanimated-carousel'
 import { LinearGradient } from 'expo-linear-gradient'
 import StarRating from 'react-native-star-rating-widget';
+import * as Progress from 'react-native-progress';
 
 
 
-export default function Home({navigation }) {
+export default function Home({ navigation }) {
 
   const width = Dimensions.get('window').width;
   const [rating, setRating] = useState(1);
@@ -48,11 +49,13 @@ export default function Home({navigation }) {
   //   setCurrentItem(data?.results[0])
   // }, [data])
 
+ 
+
   return (
     <SafeAreaView className="flex-1  bg-black">
-
-
-      <View className="w-full h-[60%]  absolute ">
+      {isLoading ==false ? <>
+      
+        <View className="w-full h-[60%]  absolute ">
         <ImageBackground
           className="w-full h-full"
           source={{ uri: `${IMG_PATH + currentItem?.backdrop_path}` }}
@@ -94,7 +97,7 @@ export default function Home({navigation }) {
           data={data?.results}
           onSnapToItem={handleSnapToItem}
           renderItem={({ item }) => (
-            <TouchableOpacity onPress={() => navigation.navigate('Details',{id: item.id, data:item})} className='flex-1 relative'>
+            <TouchableOpacity onPress={() => navigation.navigate('Details', { id: item.id, data: item })} className='flex-1 relative'>
               <>
                 <View className="w-full h-full ">
                   <Image
@@ -152,7 +155,7 @@ export default function Home({navigation }) {
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
               <>
-                <TouchableOpacity  onPress={() => navigation.navigate('Details',{id: item.id, data:item})} className="w-[110px] h-full">
+                <TouchableOpacity onPress={() => navigation.navigate('Details', { id: item.id, data: item })} className="w-[110px] h-full">
                   <Image
                     className="w-[100px] h-[90%] rounded-[10px]"
                     source={{ uri: `${IMG_PATH}${item.poster_path}` }}
@@ -176,7 +179,7 @@ export default function Home({navigation }) {
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
               <>
-                <TouchableOpacity  onPress={() => navigation.navigate('Details',{id: item.id, data:item})} className="w-[110px] h-full">
+                <TouchableOpacity onPress={() => navigation.navigate('Details', { id: item.id, data: item })} className="w-[110px] h-full">
                   <Image
                     className="w-[100px] h-[90%] rounded-[10px]"
                     source={{ uri: `${IMG_PATH}${item.poster_path}` }}
@@ -194,6 +197,9 @@ export default function Home({navigation }) {
 
       </ScrollView>
 
+      </> : <View className="w-full h-full flex-1 justify-center items-center">
+      <Progress.CircleSnail  size={60} indeterminate={true} color="red"  />
+      </View>}
     </SafeAreaView >
   )
 }

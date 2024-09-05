@@ -8,6 +8,7 @@ import { IMG_PATH, IMG_PATH_2 } from '../../constants/img';
 import { LinearGradient } from 'expo-linear-gradient';
 import StarRating from 'react-native-star-rating-widget';
 import api from '../../api/api';
+import * as Progress from 'react-native-progress';
 
 
 export default function MovieDetail({ route, navigation }) {
@@ -39,73 +40,78 @@ export default function MovieDetail({ route, navigation }) {
 
   return (
     <SafeAreaView className="flex-1 bg-black">
-      <View className="w-full h-[60%]  absolute ">
-        <Image
-          className="w-full h-full"
-          source={{ uri: `${IMG_PATH + data?.backdrop_path}` }}
-          contentFit="cover"
-        />
-        <LinearGradient
-          colors={['#000', 'transparent']}
-          start={{ x: 2, y: 1 }}
-          end={{ x: 2.3, y: 0 }}
-          className="w-full h-full absolute "
-        />
-      </View>
-      <View className="flex w-[100%] flex-row h-[70px] justify-between items-center p-5">
-
-        <TouchableOpacity onPress={() => navigation.goBack()} >
-          <ArrowLeft size={30} color="white" />
-        </TouchableOpacity>
-
-        <TouchableOpacity>
-          <Heart size={30} color="white" />
-        </TouchableOpacity>
-
-
-      </View>
-
-      <View className="flex flex-row w-full h-[300px] p-5">
-        <View className="pr-4">
+      {loanding == true || isLoading == true ? <>
+        <View className="w-full h-full flex-1 justify-center items-center">
+          <Progress.CircleSnail size={60} indeterminate={true} color="red"  />
+        </View>
+      </> : <>
+        <View className="w-full h-[60%]  absolute ">
           <Image
-            className="w-[150px] h-[250px]  rounded-[20px]"
-            source={`${IMG_PATH}` + data.poster_path}
+            className="w-full h-full"
+            source={{ uri: `${IMG_PATH + data?.backdrop_path}` }}
             contentFit="cover"
-
+          />
+          <LinearGradient
+            colors={['#000', 'transparent']}
+            start={{ x: 2, y: 1 }}
+            end={{ x: 2.3, y: 0 }}
+            className="w-full h-full absolute "
           />
         </View>
-        <View className="w-[50%]">
-          <Text className="text-white text-[15px] font-bold ">
-            Estreno
-          </Text>
-          <Text className="text-white text-[15px] font-light mb-2">
-            {data.release_date}
-          </Text>
-          <Text className="text-white text-[15px] font-bold ">
-            Calificacion
-          </Text>
-          <View className="flex flex-row gap-2">
-            <StarRating
-              rating={1}
-              delay={4}
-              maxStars={1}
-              starSize={20}
+        <View className="flex w-[100%] flex-row h-[70px] justify-between items-center p-5">
+
+          <TouchableOpacity onPress={() => navigation.goBack()} >
+            <ArrowLeft size={30} color="white" />
+          </TouchableOpacity>
+
+          <TouchableOpacity>
+            <Heart size={30} color="white" />
+          </TouchableOpacity>
+
+
+        </View>
+
+        <View className="flex flex-row w-full h-[300px] p-5">
+          <View className="pr-4">
+            <Image
+              className="w-[150px] h-[250px]  rounded-[20px]"
+              source={`${IMG_PATH}` + data.poster_path}
+              contentFit="cover"
+
             />
-            <Text className="text-white text-[15px] font-semibold mb-4">
-              {data.vote_count}
+          </View>
+          <View className="w-[50%]">
+            <Text className="text-white text-[15px] font-bold ">
+              Estreno
+            </Text>
+            <Text className="text-white text-[15px] font-light mb-2">
+              {data.release_date}
+            </Text>
+            <Text className="text-white text-[15px] font-bold ">
+              Calificacion
+            </Text>
+            <View className="flex flex-row gap-2">
+              <StarRating
+                rating={1}
+                delay={4}
+                maxStars={1}
+                starSize={20}
+              />
+              <Text className="text-white text-[15px] font-semibold mb-4">
+                {data.vote_count}
+              </Text>
+            </View>
+            <Text className="text-white text-[10px] w-full text-justify font-light mb-4">
+              {data.overview}
+            </Text>
+            <Text className="text-white text-[10px] w-full text-justify font-light mb-4">
+              {/* {detail?.resutls[0]?.genres[0]?.name} */}
             </Text>
           </View>
-          <Text className="text-white text-[10px] w-full text-justify font-light mb-4">
-            {data.overview}
-          </Text>
-          <Text className="text-white text-[10px] w-full text-justify font-light mb-4">
-            {/* {detail?.resutls[0]?.genres[0]?.name} */}
-          </Text>
         </View>
-      </View>
 
-      <View className="w-[400px] h-10 pl-5">
-        {isLoading == false ? <>
+        <View className="w-[400px] h-10 pl-5">
+
           <FlatList
             contentContainerStyle={{ paddingHorizontal: 0 }}
             data={detail?.genres}
@@ -121,21 +127,19 @@ export default function MovieDetail({ route, navigation }) {
               </>
             )}
           />
-        </> : <>
-          <Text className="text-white">Cargando...</Text>
-        </>}
-      </View>
 
-      <View className="mt-3 p-5 w-full h-[300px]">
-        <Text className="text-white text-[20px] my-2">Credits</Text>
-        <FlatList
+        </View>
+
+        <View className="mt-3 p-5 w-full h-[300px]">
+          <Text className="text-white text-[20px] my-2">Credits</Text>
+          <FlatList
             contentContainerStyle={{ paddingHorizontal: 0 }}
             data={credit?.cast}
             horizontal
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
               <>
-                <TouchableOpacity  className="w-[110px] h-full">
+                <TouchableOpacity className="w-[110px] h-full">
                   <Image
                     className="w-[100px] h-[70%] rounded-[20px]"
                     source={{ uri: `${IMG_PATH}${item.profile_path}` }}
@@ -143,16 +147,17 @@ export default function MovieDetail({ route, navigation }) {
                     contentFit="contain"
                   />
                   <Text className="text-white text-[10px] font-extralight">
-                   {item.character}
+                    {item.character}
                   </Text>
                   <Text className="text-white text-[10px] font-semibold">
-                   {item.original_name}
+                    {item.original_name}
                   </Text>
                 </TouchableOpacity>
               </>
             )}
           />
-      </View>
+        </View>
+      </>}
     </SafeAreaView>
   )
 }

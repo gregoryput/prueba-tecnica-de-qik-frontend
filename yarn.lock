@@ -5726,6 +5726,13 @@ react-native-gesture-handler@~2.16.1:
     lodash "^4.17.21"
     prop-types "^15.7.2"
 
+react-native-progress@^5.0.1:
+  version "5.0.1"
+  resolved "https://registry.npmjs.org/react-native-progress/-/react-native-progress-5.0.1.tgz#4e15258b5661c49bad74554352326ca540bb7c58"
+  integrity sha512-TYfJ4auAe5vubDma2yfFvt7ktSI+UCfysqJnkdHEcLXqAitRFOozgF/cLgN5VNi/iLdaf3ga1ETi2RF4jVZ/+g==
+  dependencies:
+    prop-types "^15.7.2"
+
 react-native-reanimated-carousel@^3.5.1:
   version "3.5.1"
   resolved "https://registry.npmjs.org/react-native-reanimated-carousel/-/react-native-reanimated-carousel-3.5.1.tgz#3605b9959ffc0aa1c6b8b8736d98f91f46e36b17"
