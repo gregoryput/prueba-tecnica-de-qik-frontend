@@ -93,11 +93,12 @@ export default function Home({ navigation }) {
       </View>
 
       <View className="flex w-[100%] flex-row h-[70px] justify-between items-center p-5">
-        <Image
+        {/* <Image
           className="w-[100px] h-[100px]"
           source={`${IMG_PATH_2 + "/wwemzKWzjKYJFfCeiB57q3r4Bcm.svg"}`}
           contentFit="cover"
-        />
+        /> */}
+        <Text className="text-red-500 font-bold text-[25px]">Movies Inc</Text>
         <TouchableOpacity>
           <SearchIcon size={30} color="white" />
         </TouchableOpacity>

@@ -146,9 +146,9 @@ export default function MovieDetail({ route, navigation }) {
                   </> : <>
                     <Image
                       className="w-[100px] h-[70%] rounded-[20px]"
-                      source={{ uri: `${IMG_PATH}/wwemzKWzjKYJFfCeiB57q3r4Bcm.svg` }}
+                      source={{ uri: `https://cdn.pixabay.com/photo/2018/11/13/21/43/avatar-3814049_640.png` }}
                       // style={{ width: 200, height: '100%' }}
-                      contentFit="contain"
+                      contentFit="cover"
                     />
                   </>}
                   <Text className="text-white text-[10px] font-extralight">
