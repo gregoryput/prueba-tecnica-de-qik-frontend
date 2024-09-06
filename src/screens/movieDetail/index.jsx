@@ -1,15 +1,16 @@
-import { View, Text, TouchableOpacity, FlatList } from 'react-native'
-import React, { useState, useEffect } from 'react'
+import { View, Text, TouchableOpacity, FlatList, VirtualizedList, Modal } from 'react-native'
+import react, { useState, useEffect } from "react";
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { ArrowLeft, Heart } from 'lucide-react-native';
-import { useQuery } from '@tanstack/react-query'
+import { ArrowLeft, Heart, Star, X, } from 'lucide-react-native';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Image } from 'expo-image';
-import { IMG_PATH, IMG_PATH_2 } from '../../constants/img';
+import { IMG_PATH } from '../../constants/img';
 import { LinearGradient } from 'expo-linear-gradient';
 import StarRating from 'react-native-star-rating-widget';
 import api from '../../api/api';
 import * as Progress from 'react-native-progress';
-
+import * as NavigationBar from 'expo-navigation-bar';
+import { QueryClient } from 'react-query';
 
 export default function MovieDetail({ route, navigation }) {
   const { id, data } = route.params;
@@ -42,7 +43,7 @@ export default function MovieDetail({ route, navigation }) {
     <SafeAreaView className="flex-1 bg-black">
       {loanding == true || isLoading == true ? <>
         <View className="w-full h-full flex-1 justify-center items-center">
-          <Progress.CircleSnail size={60} indeterminate={true} color="red"  />
+          <Progress.CircleSnail size={60} indeterminate={true} color="red" />
         </View>
       </> : <>
         <View className="w-full h-[60%]  absolute ">
@@ -82,31 +83,26 @@ export default function MovieDetail({ route, navigation }) {
           </View>
           <View className="w-[50%]">
             <Text className="text-white text-[15px] font-bold ">
-              Estreno
+              Premiere
             </Text>
             <Text className="text-white text-[15px] font-light mb-2">
               {data.release_date}
             </Text>
             <Text className="text-white text-[15px] font-bold ">
-              Calificacion
+              Votes
             </Text>
-            <View className="flex flex-row gap-2">
-              <StarRating
-                rating={1}
-                delay={4}
-                maxStars={1}
-                starSize={20}
-              />
-              <Text className="text-white text-[15px] font-semibold mb-4">
+            <View className="flex flex-row  gap-4 justify-center mb-3">
+
+              <Text className="text-white text-[15px] font-semibold">
                 {data.vote_count}
               </Text>
+              <ModalRating id={id} />
             </View>
-            <Text className="text-white text-[10px] w-full text-justify font-light mb-4">
+
+            <Text className="text-white text-[10px] w-full text-justify font-light">
               {data.overview}
             </Text>
-            <Text className="text-white text-[10px] w-full text-justify font-light mb-4">
-              {/* {detail?.resutls[0]?.genres[0]?.name} */}
-            </Text>
+
           </View>
         </View>
 
@@ -127,7 +123,6 @@ export default function MovieDetail({ route, navigation }) {
               </>
             )}
           />
-
         </View>
 
         <View className="mt-3 p-5 w-full h-[300px]">
@@ -136,16 +131,26 @@ export default function MovieDetail({ route, navigation }) {
             contentContainerStyle={{ paddingHorizontal: 0 }}
             data={credit?.cast}
             horizontal
-            keyExtractor={(item) => item.id}
+            initialNumToRender={5}
+            keyExtractor={(item) => item.id.toString()}
             renderItem={({ item }) => (
               <>
                 <TouchableOpacity className="w-[110px] h-full">
-                  <Image
-                    className="w-[100px] h-[70%] rounded-[20px]"
-                    source={{ uri: `${IMG_PATH}${item.profile_path}` }}
-                    // style={{ width: 200, height: '100%' }}
-                    contentFit="contain"
-                  />
+                  {item.profile_path != null || item.profile_path != undefined ? <>
+                    <Image
+                      className="w-[100px] h-[70%] rounded-[20px]"
+                      source={{ uri: `${IMG_PATH}${item.profile_path}` }}
+                      // style={{ width: 200, height: '100%' }}
+                      contentFit="contain"
+                    />
+                  </> : <>
+                    <Image
+                      className="w-[100px] h-[70%] rounded-[20px]"
+                      source={{ uri: `${IMG_PATH}/wwemzKWzjKYJFfCeiB57q3r4Bcm.svg` }}
+                      // style={{ width: 200, height: '100%' }}
+                      contentFit="contain"
+                    />
+                  </>}
                   <Text className="text-white text-[10px] font-extralight">
                     {item.character}
                   </Text>
@@ -161,3 +166,86 @@ export default function MovieDetail({ route, navigation }) {
     </SafeAreaView>
   )
 }
+
+
+
+
+const ModalRating = ({ id }) => {
+  const [modalVisible, setModalVisible] = useState(false);
+  const [rating, setRating] = useState(0);
+  const queryClient = useQueryClient();
+
+  const InsertRating = async (data) => {
+    const { data: response } = await api.post(`/movie/${id}/rating`, data);
+    return response;
+  };
+
+  const mutationRating = useMutation({
+    mutationFn: InsertRating,
+    onSuccess: (data) => {
+      console.log("Data received in postRating:", data);
+      setModalVisible(!modalVisible);
+      queryClient.invalidateQueries({ queryKey: ['details','topRated','popular','movies'] })
+    }
+  })
+
+
+  const postRating = () => {
+    let dataJson = {
+      "value": rating
+    }
+
+
+    mutationRating.mutate(dataJson)
+  }
+
+
+  return (
+    <View className="flex-1">
+      <Modal
+        animationType="slide"
+        visible={modalVisible}
+        transparent={true}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}
+      >
+        <View className="flex-1 justify-center items-center">
+
+          <View className="bg-black justify-center items-center rounded-lg p-8 shadow-lg w-[300px] h-[200px]">
+            <TouchableOpacity
+              className=" rounded-lg p-3 mt-2  absolute right-0 top-0"
+              onPress={() => setModalVisible(!modalVisible)}
+            >
+
+              <X size={25} color="white" />
+
+            </TouchableOpacity >
+            <Text className="text-white text-[20px] mb-5">Qualification {rating}</Text>
+            <StarRating
+              rating={rating}
+              delay={4} // Delay si deseas un efecto de espera, puedes ajustarlo según tus necesidades
+              maxStars={5} // Número de estrellas
+              starSize={30} // Tamaño de las estrellas
+              onChange={(newRating) => setRating(newRating)} // Actualiza la calificación cuando se presiona
+            />
+            <TouchableOpacity
+              className=" rounded-lg p-3 mt-4"
+              onPress={() => postRating()}
+            >
+
+              <Text className="text-white font-bold text-center">Confirm</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      <TouchableOpacity
+        className="flex flex-row gap-3 w-[100px] h-[40px] ml-4"
+        onPress={() => setModalVisible(true)}
+      >
+        <Star size={25} color="white" />
+      </TouchableOpacity>
+    </View>
+  );
+};

@@ -17,6 +17,7 @@ export default function Home({ navigation }) {
 
   const width = Dimensions.get('window').width;
   const [rating, setRating] = useState(1);
+
   const fetchMovie = async () => {
     const response = await api.get('/movie/now_playing?language=en-US&page=1');
     return response.data;
@@ -26,6 +27,28 @@ export default function Home({ navigation }) {
     queryKey: ['movies'],
     queryFn: fetchMovie,
   });
+
+  const fetchPopular = async () => {
+    const response = await api.get('/movie/popular?language=en-US&page=1');
+    return response.data;
+  };
+
+  const { isLoading: isPopular, data: popular } = useQuery({
+    queryKey: ['popular'],
+    queryFn: fetchPopular,
+  });
+
+
+  const fetchTopRated = async () => {
+    const response = await api.get('/movie/top_rated?language=en-US&page=1');
+    return response.data;
+  };
+
+  const { isLoading: isTopRated, data: topRated } = useQuery({
+    queryKey: ['topRated'],
+    queryFn: fetchTopRated,
+  });
+
 
   const [currentItem, setCurrentItem] = useState();
 
@@ -53,7 +76,7 @@ export default function Home({ navigation }) {
 
   return (
     <SafeAreaView className="flex-1  bg-black">
-      {isLoading ==false ? <>
+      {isLoading ==false || isTopRated ==false || isPopular == false? <>
       
         <View className="w-full h-[60%]  absolute ">
         <ImageBackground
@@ -115,13 +138,13 @@ export default function Home({ navigation }) {
                 <View className=" pl-5 absolute w-full left-52">
 
                   <Text className="text-white text-[25px] font-bold ">
-                    Estreno
+                  Premiere
                   </Text>
                   <Text className="text-white text-[20px] font-light mb-5">
                     {item.release_date}
                   </Text>
                   <Text className="text-white text-[25px] font-bold ">
-                    Calificacion
+                    Votes
                   </Text>
                   <View className="flex flex-row gap-2">
                     <StarRating
@@ -147,10 +170,10 @@ export default function Home({ navigation }) {
 
       <ScrollView className="w-full h-[50%] absolute bottom-0 p-5">
         <View className="h-[270px]">
-          <Text className="text-white mt-9  text-[20px]">Tendencia</Text>
+          <Text className="text-white mt-9  text-[20px]">Popular</Text>
           <FlatList
             contentContainerStyle={{ paddingHorizontal: 0 }}
-            data={data?.results}
+            data={popular?.results}
             horizontal
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
@@ -171,10 +194,10 @@ export default function Home({ navigation }) {
           />
         </View>
         <View className="h-[270px]">
-          <Text className="text-white mt-5  text-[20px]">Populares</Text>
+          <Text className="text-white mt-5  text-[20px]">Top Rated</Text>
           <FlatList
             contentContainerStyle={{ paddingHorizontal: 0 }}
-            data={data?.results}
+            data={topRated?.results}
             horizontal
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
@@ -198,7 +221,7 @@ export default function Home({ navigation }) {
       </ScrollView>
 
       </> : <View className="w-full h-full flex-1 justify-center items-center">
-      <Progress.CircleSnail  size={60} indeterminate={true} color="red"  />
+      <Progress.CircleSnail  size={60} indeterminate={true} color="red"   />
       </View>}
     </SafeAreaView >
   )
